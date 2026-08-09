@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Asistente de Planificación · Aventura Musical Pro</title>
+<meta name="description" content="Encuentra la actividad musical perfecta para tu próxima clase en segundos.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+  :root{
+    --cielo:#4FB6E8;
+    --cielo-suave:#E4F6FD;
+    --sol:#FFC93C;
+    --sol-suave:#FFF6DF;
+    --manzana:#7FD858;
+    --manzana-suave:#EAFAE1;
+    --coral:#FF6F59;
+    --coral-suave:#FFE9E5;
+    --crema:#FFFBF2;
+    --tarjeta:#FFFFFF;
+    --tinta:#2E2A4A;
+    --tinta-suave:#726E93;
+    --linea:#EDE9F7;
+    --radius-lg:26px;
+    --radius-md:16px;
+    --radius-sm:10px;
+    --sombra-suave:0 10px 28px rgba(46,42,74,.08);
+    --sombra-hover:0 22px 44px rgba(46,42,74,.16);
+    --font-display:'Quicksand', sans-serif;
+    --font-body:'Nunito', sans-serif;
+  }
+
+  *,*::before,*::after{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    background:var(--crema);
+    color:var(--tinta);
+    font-family:var(--font-body);
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  h1,h2,h3,h4{ font-family:var(--font-display); margin:0; }
+  p{ margin:0; }
+  button{ font-family:inherit; cursor:pointer; }
+  ::selection{ background:var(--sol); color:var(--tinta); }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+  }
+
+  /* ===================== HEADER / HERO ===================== */
+  .hero{
+    position:relative;
+    background:linear-gradient(120deg, var(--cielo) 0%, #6FCBEF 55%, var(--sol) 130%);
+    padding:52px 24px 96px;
+    overflow:hidden;
+    isolation:isolate;
+  }
+  .hero__notas{ position:absolute; inset:0; pointer-events:none; z-index:0; }
+  .hero__notas i{
+    position:absolute;
+    color:rgba(255,255,255,.55);
+    animation:flotar 7s ease-in-out infinite;
+    filter:drop-shadow(0 6px 10px rgba(0,0,0,.06));
+  }
+  .hero__notas i:nth-child(1){ top:14%; left:6%; font-size:26px; animation-delay:0s; }
+  .hero__notas i:nth-child(2){ top:60%; left:12%; font-size:18px; animation-delay:1.2s; }
+  .hero__notas i:nth-child(3){ top:22%; left:88%; font-size:30px; animation-delay:.4s; }
+  .hero__notas i:nth-child(4){ top:70%; left:90%; font-size:20px; animation-delay:2s; }
+  .hero__notas i:nth-child(5){ top:8%; left:48%; font-size:16px; animation-delay:1.6s; }
+  .hero__notas i:nth-child(6){ top:78%; left:55%; font-size:22px; animation-delay:.8s; }
+
+  @keyframes flotar{
+    0%,100%{ transform:translateY(0) rotate(0deg); opacity:.5; }
+    50%{ transform:translateY(-18px) rotate(8deg); opacity:.9; }
+  }
+
+  .hero__contenido{ position:relative; z-index:1; max-width:920px; margin:0 auto; text-align:center; }
+  .hero__eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    background:rgba(255,255,255,.35);
+    border:1px solid rgba(255,255,255,.6);
+    color:#1D3A4A;
+    font-family:var(--font-body); font-weight:800; font-size:12.5px;
+    letter-spacing:.06em; text-transform:uppercase;
+    padding:7px 16px; border-radius:999px; margin-bottom:18px;
+    backdrop-filter:blur(4px);
+  }
+  .hero h1{
+    font-size:clamp(32px, 5vw, 52px);
+    font-weight:700;
+    color:#1D3A4A;
+    line-height:1.08;
+    text-shadow:0 2px 0 rgba(255,255,255,.25);
+  }
+  .hero p.subtitulo{
+    margin-top:14px;
+    font-size:clamp(15px, 2vw, 18px);
+    color:#22394A;
+    font-weight:600;
+    max-width:560px;
+    margin-left:auto; margin-right:auto;
+    opacity:.85;
+  }
+
+  /* pentagrama decorativo */
+  .pentagrama{
+    position:absolute; left:0; right:0; bottom:0; height:64px; z-index:0;
+    display:block; width:100%;
+  }
+
+  /* ===================== FILTROS ===================== */
+  .filtros-wrap{
+    position:relative; z-index:2;
+    max-width:1040px;
+    margin:-58px auto 0;
+    padding:0 20px;
+  }
+  .filtros{
+    background:var(--tarjeta);
+    border-radius:var(--radius-lg);
+    box-shadow:var(--sombra-suave);
+    padding:22px;
+    display:grid;
+    grid-template-columns:repeat(3, 1fr) auto;
+    gap:14px;
+    align-items:stretch;
+  }
+  .campo{
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .campo label{
+    font-size:12.5px; font-weight:800; color:var(--tinta-suave);
+    display:flex; align-items:center; gap:6px;
+    padding-left:4px;
+    letter-spacing:.02em;
+  }
+  .campo label i{ width:14px; text-align:center; }
+  .campo--edad label i{ color:var(--sol); filter:saturate(1.4); }
+  .campo--instrumento label i{ color:var(--cielo); }
+  .campo--objetivo label i{ color:var(--manzana); }
+
+  .select-shell{ position:relative; }
+  .select-shell select{
+    appearance:none; -webkit-appearance:none;
+    width:100%;
+    font-family:var(--font-body);
+    font-weight:700;
+    font-size:14.5px;
+    color:var(--tinta);
+    background:var(--crema);
+    border:2px solid var(--linea);
+    border-radius:var(--radius-sm);
+    padding:12px 38px 12px 14px;
+    transition:border-color .2s ease, box-shadow .2s ease, transform .15s ease;
+  }
+  .select-shell::after{
+    content:'\f078';
+    font-family:'Font Awesome 6 Free'; font-weight:900;
+    position:absolute; right:14px; top:50%; transform:translateY(-50%);
+    font-size:12px; color:var(--tinta-suave); pointer-events:none;
+  }
+  .campo--edad .select-shell select:focus{ border-color:var(--sol); box-shadow:0 0 0 4px var(--sol-suave); }
+  .campo--instrumento .select-shell select:focus{ border-color:var(--cielo); box-shadow:0 0 0 4px var(--cielo-suave); }
+  .campo--objetivo .select-shell select:focus{ border-color:var(--manzana); box-shadow:0 0 0 4px var(--manzana-suave); }
+  .select-shell select:focus{ outline:none; }
+  .select-shell select:hover{ border-color:#D9D4EC; }
+
+  .btn-limpiar{
+    align-self:flex-end;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    background:var(--tinta);
+    color:#fff;
+    border:none;
+    border-radius:var(--radius-sm);
+    padding:0 20px;
+    font-weight:700;
+    font-size:14px;
+    height:46px;
+    transition:transform .15s ease, background .2s ease;
+    white-space:nowrap;
+  }
+  .btn-limpiar:hover{ background:var(--coral); transform:translateY(-2px); }
+  .btn-limpiar:active{ transform:translateY(0); }
+
+  @media (max-width:860px){
+    .filtros{ grid-template-columns:1fr 1fr; }
+    .btn-limpiar{ grid-column:1 / -1; height:44px; }
+  }
+  @media (max-width:560px){
+    .filtros{ grid-template-columns:1fr; padding:18px; }
+    .filtros-wrap{ margin-top:-44px; }
+  }
+
+  /* ===================== CONTENIDO / RESULTADOS ===================== */
+  .contenedor{ max-width:1160px; margin:0 auto; padding:40px 20px 80px; }
+
+  .resultados-info{
+    display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:10px;
+    margin-bottom:22px;
+    padding:0 4px;
+  }
+  .resultados-info h2{
+    font-size:18px; color:var(--tinta);
+    display:flex; align-items:center; gap:8px;
+  }
+  .resultados-info h2 span{
+    background:var(--coral); color:#fff;
+    font-family:var(--font-body); font-weight:800; font-size:12.5px;
+    border-radius:999px; padding:3px 11px;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(272px, 1fr));
+    gap:22px;
+  }
+
+  .tarjeta{
+    background:var(--tarjeta);
+    border-radius:var(--radius-lg);
+    padding:22px;
+    box-shadow:var(--sombra-suave);
+    border:1px solid rgba(46,42,74,.04);
+    cursor:pointer;
+    display:flex; flex-direction:column; gap:14px;
+    transition:transform .25s cubic-bezier(.2,.8,.3,1), box-shadow .25s ease, border-color .25s ease;
+    position:relative;
+    overflow:hidden;
+  }
+  .tarjeta::before{
+    content:'';
+    position:absolute; top:0; left:0; right:0; height:6px;
+    background:var(--acento, var(--cielo));
+  }
+  .tarjeta:hover, .tarjeta:focus-visible{
+    transform:translateY(-6px) scale(1.012);
+    box-shadow:var(--sombra-hover);
+    outline:none;
+  }
+  .tarjeta:focus-visible{ border-color:var(--acento, var(--cielo)); }
+
+  .tarjeta__top{ display:flex; align-items:center; gap:12px; }
+  .tarjeta__icono{
+    width:44px; height:44px; min-width:44px;
+    border-radius:14px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--acento-suave, var(--cielo-suave));
+    color:var(--acento, var(--cielo));
+    font-size:18px;
+  }
+  .tarjeta__titulo{ font-size:17px; font-weight:700; line-height:1.25; color:var(--tinta); }
+
+  .tarjeta__objetivo{
+    font-size:13.5px; color:var(--tinta-suave); font-weight:600;
+    line-height:1.5;
+    display:flex; gap:8px;
+  }
+  .tarjeta__objetivo i{ color:var(--manzana); margin-top:3px; }
+  .tarjeta__objetivo span{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+
+  .tarjeta__pills{ display:flex; flex-wrap:wrap; gap:8px; margin-top:auto; }
+  .pill{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:12px; font-weight:800;
+    padding:6px 11px; border-radius:999px;
+  }
+  .pill--edad{ background:var(--sol-suave); color:#8A6400; }
+  .pill--tiempo{ background:var(--coral-suave); color:#B23A26; }
+  .pill--instrumento{ background:var(--cielo-suave); color:#0E6B98; }
+
+  .tarjeta__ver{
+    display:flex; align-items:center; gap:6px;
+    font-size:12.5px; font-weight:800; color:var(--acento, var(--cielo));
+    opacity:0; transform:translateX(-4px);
+    transition:opacity .2s ease, transform .2s ease;
+  }
+  .tarjeta:hover .tarjeta__ver{ opacity:1; transform:translateX(0); }
+
+  /* estados */
+  .estado{
+    grid-column:1 / -1;
+    text-align:center;
+    padding:70px 20px;
+    color:var(--tinta-suave);
+  }
+  .estado i{ font-size:40px; color:var(--cielo); margin-bottom:16px; display:block; }
+  .estado h3{ color:var(--tinta); font-size:19px; margin-bottom:6px; }
+  .estado p{ font-size:14.5px; }
+  .estado--error i{ color:var(--coral); }
+
+  .cargando{ grid-column:1/-1; display:flex; flex-direction:column; align-items:center; padding:70px 20px; gap:14px; color:var(--tinta-suave); font-weight:700;}
+  .nota-girando{ font-size:34px; color:var(--cielo); animation:girar 1.1s linear infinite; }
+  @keyframes girar{ to{ transform:rotate(360deg); } }
+
+  /* ===================== MODAL ===================== */
+  .modal-overlay{
+    position:fixed; inset:0;
+    background:rgba(29,32,53,.55);
+    backdrop-filter:blur(6px);
+    display:flex; align-items:center; justify-content:center;
+    padding:20px;
+    z-index:100;
+    opacity:0; visibility:hidden;
+    transition:opacity .28s ease, visibility 0s linear .28s;
+  }
+  .modal-overlay.activo{
+    opacity:1; visibility:visible;
+    transition:opacity .28s ease, visibility 0s linear 0s;
+  }
+
+  .modal{
+    background:var(--crema);
+    width:100%; max-width:620px;
+    max-height:88vh;
+    overflow-y:auto;
+    border-radius:28px;
+    box-shadow:0 30px 70px rgba(0,0,0,.25);
+    transform:translateY(24px) scale(.96);
+    opacity:0;
+    transition:transform .32s cubic-bezier(.2,.9,.25,1.1), opacity .28s ease;
+  }
+  .modal-overlay.activo .modal{ transform:translateY(0) scale(1); opacity:1; }
+
+  .modal__header{
+    background:linear-gradient(120deg, var(--acento, var(--cielo)), color-mix(in srgb, var(--acento, var(--cielo)) 60%, white));
+    padding:30px 56px 26px 26px;
+    position:relative;
+  }
+  .modal__cerrar{
+    position:absolute; top:16px; right:16px;
+    width:38px; height:38px; border-radius:50%;
+    background:rgba(255,255,255,.35);
+    border:none; color:#fff; font-size:16px;
+    display:flex; align-items:center; justify-content:center;
+    transition:background .2s ease, transform .2s ease;
+  }
+  .modal__cerrar:hover{ background:rgba(255,255,255,.6); transform:rotate(90deg); }
+
+  .modal__titulo{
+    color:#fff; font-size:clamp(22px,4vw,28px); line-height:1.2;
+    text-shadow:0 2px 10px rgba(0,0,0,.12);
+    padding-right:10px;
+  }
+
+  .modal__tags{ display:flex; flex-wrap:wrap; gap:9px; padding:20px 26px 0; }
+  .modal__tags .pill{ font-size:12.5px; padding:7px 13px; background:#fff; box-shadow:0 4px 10px rgba(0,0,0,.05); }
+  .modal__tags .pill--edad{ color:#8A6400; }
+  .modal__tags .pill--tiempo{ color:#B23A26; }
+  .modal__tags .pill--instrumento{ color:#0E6B98; }
+
+  .modal__objetivo{
+    margin:20px 26px 0;
+    background:var(--manzana-suave);
+    border-left:4px solid var(--manzana);
+    border-radius:12px;
+    padding:14px 16px;
+    font-size:14.5px; font-weight:700; color:#3C6A22;
+    display:flex; gap:10px; align-items:flex-start;
+    line-height:1.5;
+  }
+  .modal__objetivo i{ margin-top:2px; }
+
+  .modal__cuerpo{ padding:22px 26px 30px; }
+  .modal__cuerpo h4{
+    font-size:13px; text-transform:uppercase; letter-spacing:.08em;
+    color:var(--tinta-suave); margin-bottom:12px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .modal__cuerpo h4 i{ color:var(--acento, var(--cielo)); }
+
+  .instrucciones{ font-size:16.5px; line-height:1.85; color:var(--tinta); }
+  .instrucciones p{ white-space:pre-line; }
+  .instrucciones ol{ margin:0; padding-left:0; list-style:none; counter-reset:paso; display:flex; flex-direction:column; gap:16px; }
+  .instrucciones li{
+    counter-increment:paso;
+    display:flex; gap:14px;
+    background:#fff; border-radius:14px; padding:14px 16px;
+    box-shadow:0 4px 14px rgba(46,42,74,.05);
+  }
+  .instrucciones li::before{
+    content:counter(paso);
+    min-width:28px; height:28px;
+    background:var(--acento, var(--cielo));
+    color:#fff; font-family:var(--font-display); font-weight:700;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:13.5px;
+  }
+
+  @media (max-width:560px){
+    .modal{ max-height:92vh; border-radius:22px; }
+    .modal__header{ padding:26px 50px 22px 20px; }
+    .modal__tags, .modal__objetivo{ margin-left:20px; margin-right:20px; }
+    .modal__cuerpo{ padding:20px 20px 26px; }
+  }
+
+  /* footer */
+  .pie{ text-align:center; padding:26px 20px 46px; color:var(--tinta-suave); font-size:13px; font-weight:600; }
+  .pie i{ color:var(--coral); }
+</style>
+</head>
+<body>
+
+  <header class="hero">
+    <div class="hero__notas" aria-hidden="true">
+      <i class="fa-solid fa-music"></i>
+      <i class="fa-solid fa-music"></i>
+      <i class="fa-solid fa-music"></i>
+      <i class="fa-solid fa-music"></i>
+      <i class="fa-solid fa-music"></i>
+      <i class="fa-solid fa-music"></i>
+    </div>
+    <div class="hero__contenido">
+      <span class="hero__eyebrow"><i class="fa-solid fa-wand-magic-sparkles"></i> Aventura Musical Pro</span>
+      <h1>Asistente de Planificación</h1>
+      <p class="subtitulo">Encuentra en segundos la actividad perfecta para tu próxima clase, filtrada por edad, instrumento y objetivo pedagógico.</p>
+    </div>
+
+    <svg class="pentagrama" viewBox="0 0 1200 64" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0,54 C300,10 900,10 1200,54 L1200,64 L0,64 Z" fill="#FFFBF2"></path>
+    </svg>
+  </header>
+
+  <div class="filtros-wrap">
+    <div class="filtros">
+      <div class="campo campo--edad">
+        <label for="filtro-edad"><i class="fa-solid fa-child-reaching"></i> Edad del alumno</label>
+        <div class="select-shell">
+          <select id="filtro-edad">
+            <option value="">Todas las edades</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="campo campo--instrumento">
+        <label for="filtro-instrumento"><i class="fa-solid fa-guitar"></i> Instrumento</label>
+        <div class="select-shell">
+          <select id="filtro-instrumento">
+            <option value="">Todos los instrumentos</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="campo campo--objetivo">
+        <label for="filtro-objetivo"><i class="fa-solid fa-bullseye"></i> Objetivo pedagógico</label>
+        <div class="select-shell">
+          <select id="filtro-objetivo">
+            <option value="">Todos los objetivos</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn-limpiar" id="btn-limpiar" type="button">
+        <i class="fa-solid fa-broom"></i> Limpiar
+      </button>
+    </div>
+  </div>
+
+  <main class="contenedor">
+    <div class="resultados-info">
+      <h2><i class="fa-solid fa-layer-group" style="color:var(--cielo)"></i> Actividades <span id="contador">0</span></h2>
+    </div>
+
+    <div class="grid" id="grid">
+      <div class="cargando">
+        <i class="fa-solid fa-music nota-girando"></i>
+        Afinando las actividades…
+      </div>
+    </div>
+  </main>
+
+  <p class="pie">Hecho con <i class="fa-solid fa-heart"></i> para docentes de música · Aventura Musical Pro</p>
+
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+      <div class="modal__header" id="modal-header">
+        <button class="modal__cerrar" id="modal-cerrar" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <h3 class="modal__titulo" id="modal-titulo"></h3>
+      </div>
+      <div class="modal__tags" id="modal-tags"></div>
+      <div class="modal__objetivo" id="modal-objetivo-wrap">
+        <i class="fa-solid fa-bullseye"></i>
+        <span id="modal-objetivo"></span>
+      </div>
+      <div class="modal__cuerpo">
+        <h4><i class="fa-solid fa-list-check"></i> Instrucciones para el salón</h4>
+        <div class="instrucciones" id="modal-instrucciones"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+
+  const CSV_URL = 'actividades.csv';
+
+  const PALETA = [
+    { nombre:'cielo',   acento:'var(--cielo)',   suave:'var(--cielo-suave)',   icono:'fa-guitar' },
+    { nombre:'coral',   acento:'var(--coral)',   suave:'var(--coral-suave)',   icono:'fa-drum' },
+    { nombre:'manzana', acento:'var(--manzana)', suave:'var(--manzana-suave)', icono:'fa-hand-sparkles' },
+    { nombre:'sol',     acento:'var(--sol)',     suave:'var(--sol-suave)',     icono:'fa-bell' }
+  ];
+
+  const ICONOS_INSTRUMENTO = {
+    'guitarra':'fa-guitar', 'piano':'fa-music', 'teclado':'fa-music',
+    'tambor':'fa-drum', 'percusión':'fa-drum', 'percusion':'fa-drum', 'batería':'fa-drum', 'bateria':'fa-drum',
+    'voz':'fa-microphone', 'canto':'fa-microphone',
+    'xilófono':'fa-bell', 'xilofono':'fa-bell', 'metalófono':'fa-bell', 'metalofono':'fa-bell',
+    'flauta':'fa-wind', 'ukelele':'fa-guitar', 'violín':'fa-guitar', 'violin':'fa-guitar',
+    'cuerpo':'fa-hand-sparkles', 'ninguno':'fa-hand-sparkles'
+  };
+
+  const els = {
+    grid: document.getElementById('grid'),
+    contador: document.getElementById('contador'),
+    selEdad: document.getElementById('filtro-edad'),
+    selInstrumento: document.getElementById('filtro-instrumento'),
+    selObjetivo: document.getElementById('filtro-objetivo'),
+    btnLimpiar: document.getElementById('btn-limpiar'),
+    overlay: document.getElementById('modal-overlay'),
+    modalHeader: document.getElementById('modal-header'),
+    modalTitulo: document.getElementById('modal-titulo'),
+    modalTags: document.getElementById('modal-tags'),
+    modalObjetivo: document.getElementById('modal-objetivo'),
+    modalInstrucciones: document.getElementById('modal-instrucciones'),
+    modalCerrar: document.getElementById('modal-cerrar')
+  };
+
+  let actividades = [];
+
+  /* ---------- Utilidades de texto ---------- */
+
+  // "Edad Minima", "edad_minima", "Edad  Mínima " -> todas se vuelven "edad_minima".
+  // Así el CSV admite acentos, mayúsculas, espacios o guiones bajos sin romper nada.
+  function normalizarClave(str){
+    return String(str)
+      .trim()
+      .toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // quita acentos
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_+|_+$/g, '');
+  }
+
+  // Detecta si el CSV usa coma o punto y coma como separador (Excel en español
+  // suele exportar con ";" porque usa la coma como separador decimal).
+  function detectarDelimitador(primeraLinea){
+    const candidatos = [';', ',', '\t'];
+    let mejor = ',', max = -1;
+    candidatos.forEach(c => {
+      const veces = primeraLinea.split(c).length - 1;
+      if (veces > max){ max = veces; mejor = c; }
+    });
+    return mejor;
+  }
+
+  /* ---------- Parser CSV robusto (delimitador auto, comillas y saltos internos) ---------- */
+  function parseCSV(texto){
+    texto = texto.replace(/^\uFEFF/, ''); // quita BOM si existe
+    texto = texto.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+    const primeraLinea = texto.split('\n', 1)[0] || '';
+    const delimitador = detectarDelimitador(primeraLinea);
+
+    const filas = [];
+    let fila = [];
+    let campo = '';
+    let dentroComillas = false;
+
+    for (let i = 0; i < texto.length; i++){
+      const c = texto[i];
+
+      if (dentroComillas){
+        if (c === '"'){
+          if (texto[i+1] === '"'){ campo += '"'; i++; }
+          else { dentroComillas = false; }
+        } else {
+          campo += c;
+        }
+      } else {
+        if (c === '"'){
+          dentroComillas = true;
+        } else if (c === delimitador){
+          fila.push(campo); campo = '';
+        } else if (c === '\n'){
+          fila.push(campo); campo = '';
+          filas.push(fila); fila = [];
+        } else {
+          campo += c;
+        }
+      }
+    }
+    if (campo.length || fila.length){ fila.push(campo); filas.push(fila); }
+
+    const filasLimpias = filas.filter(f => f.some(c => c.trim() !== ''));
+    if (!filasLimpias.length) return [];
+
+    const encabezados = filasLimpias[0].map(h => normalizarClave(h));
+    const filasDatos = filasLimpias.slice(1);
+
+    return filasDatos.map(f => {
+      const obj = {};
+      encabezados.forEach((h, idx) => { obj[h] = (f[idx] !== undefined ? f[idx].trim() : ''); });
+      return obj;
+    });
+  }
+
+  function normalizar(actRaw, idx){
+    return {
+      id: actRaw.id || actRaw.act || String(idx),
+      titulo: actRaw.titulo || 'Actividad sin título',
+      objetivo: actRaw.objetivo || actRaw.objetivo_pedagogico || '',
+      instrumento: actRaw.instrumento || 'General',
+      edad_minima: parseInt(actRaw.edad_minima || actRaw.edad_min || 0, 10) || 0,
+      edad_maxima: parseInt(actRaw.edad_maxima || actRaw.edad_max || 99, 10) || 99,
+      duracion: actRaw.duracion || '',
+      instrucciones: actRaw.instrucciones || ''
+    };
+  }
+
+  function acentoPara(texto){
+    let hash = 0;
+    for (let i = 0; i < texto.length; i++) hash = texto.charCodeAt(i) + ((hash << 5) - hash);
+    return PALETA[Math.abs(hash) % PALETA.length];
+  }
+
+  function iconoInstrumento(nombre){
+    const clave = (nombre || '').toLowerCase().trim();
+    return ICONOS_INSTRUMENTO[clave] || 'fa-music';
+  }
+
+  // Decodifica el CSV probando primero UTF-8 estricto; si el archivo viene en
+  // Windows-1252/ISO-8859-1 (típico al exportar desde Excel en español), usa
+  // esa codificación como respaldo para que tildes, "ñ" y emojis se vean bien.
+  function decodificarBuffer(buffer){
+    try{
+      return new TextDecoder('utf-8', { fatal: true }).decode(buffer);
+    } catch(e){
+      return new TextDecoder('windows-1252').decode(buffer);
+    }
+  }
+
+  /* ---------- Carga inicial ---------- */
+  async function iniciar(){
+    try{
+      const resp = await fetch(CSV_URL, { cache: 'no-store' });
+      if (!resp.ok) throw new Error('No se pudo leer el archivo');
+      const buffer = await resp.arrayBuffer();
+      const texto = decodificarBuffer(buffer);
+      const filas = parseCSV(texto);
+
+      if (!filas.length) throw new Error('vacío');
+
+      actividades = filas.map(normalizar);
+      poblarFiltros(actividades);
+      aplicarFiltros();
+    } catch(err){
+      mostrarEstado('error',
+        'No encontramos "actividades.csv"',
+        'Verifica que el archivo esté en la misma carpeta que este sitio y que tenga al menos una fila de datos.'
+      );
+    }
+  }
+
+  function poblarFiltros(lista){
+    // Edad: rango real presente en los datos
+    let edadMin = Infinity, edadMax = -Infinity;
+    lista.forEach(a => {
+      if (a.edad_minima < edadMin) edadMin = a.edad_minima;
+      if (a.edad_maxima > edadMax) edadMax = a.edad_maxima;
+    });
+    if (!isFinite(edadMin)) edadMin = 2;
+    if (!isFinite(edadMax)) edadMax = 12;
+
+    for (let e = edadMin; e <= edadMax; e++){
+      const opt = document.createElement('option');
+      opt.value = e;
+      opt.textContent = e + ' años';
+      els.selEdad.appendChild(opt);
+    }
+
+    // Instrumento y objetivo: valores únicos ordenados
+    const instrumentos = [...new Set(lista.map(a => a.instrumento).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
+    instrumentos.forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = v; opt.textContent = v;
+      els.selInstrumento.appendChild(opt);
+    });
+
+    const objetivos = [...new Set(lista.map(a => a.objetivo).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
+    objetivos.forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = v; opt.textContent = v;
+      els.selObjetivo.appendChild(opt);
+    });
+  }
+
+  /* ---------- Filtrado ---------- */
+  function aplicarFiltros(){
+    const edad = els.selEdad.value;
+    const instrumento = els.selInstrumento.value;
+    const objetivo = els.selObjetivo.value;
+
+    const filtradas = actividades.filter(a => {
+      const okEdad = edad === '' || (parseInt(edad,10) >= a.edad_minima && parseInt(edad,10) <= a.edad_maxima);
+      const okInstrumento = instrumento === '' || a.instrumento === instrumento;
+      const okObjetivo = objetivo === '' || a.objetivo === objetivo;
+      return okEdad && okInstrumento && okObjetivo;
+    });
+
+    renderGrid(filtradas);
+  }
+
+  function renderGrid(lista){
+    els.contador.textContent = lista.length;
+    els.grid.innerHTML = '';
+
+    if (!lista.length){
+      mostrarEstado('vacio',
+        'No hay actividades con esos filtros',
+        'Prueba a cambiar la edad, el instrumento o el objetivo pedagógico.'
+      );
+      return;
+    }
+
+    const frag = document.createDocumentFragment();
+    lista.forEach(act => frag.appendChild(crearTarjeta(act)));
+    els.grid.appendChild(frag);
+  }
+
+  function crearTarjeta(act){
+    const acento = acentoPara(act.instrumento || act.titulo);
+    const card = document.createElement('article');
+    card.className = 'tarjeta';
+    card.style.setProperty('--acento', acento.acento);
+    card.style.setProperty('--acento-suave', acento.suave);
+    card.tabIndex = 0;
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-label', 'Ver detalle de ' + act.titulo);
+
+    card.innerHTML = `
+      <div class="tarjeta__top">
+        <div class="tarjeta__icono"><i class="fa-solid ${iconoInstrumento(act.instrumento)}"></i></div>
+        <h3 class="tarjeta__titulo">${escapeHTML(act.titulo)}</h3>
+      </div>
+      ${act.objetivo ? `
+      <p class="tarjeta__objetivo">
+        <i class="fa-solid fa-bullseye"></i>
+        <span>${escapeHTML(act.objetivo)}</span>
+      </p>` : ''}
+      <div class="tarjeta__pills">
+        <span class="pill pill--edad"><i class="fa-solid fa-face-smile"></i> ${act.edad_minima}–${act.edad_maxima} años</span>
+        ${act.duracion ? `<span class="pill pill--tiempo"><i class="fa-regular fa-clock"></i> ${escapeHTML(act.duracion)}</span>` : ''}
+      </div>
+      <span class="tarjeta__ver">Ver actividad completa <i class="fa-solid fa-arrow-right"></i></span>
+    `;
+
+    card.addEventListener('click', () => abrirModal(act, acento));
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); abrirModal(act, acento); }
+    });
+
+    return card;
+  }
+
+  function mostrarEstado(tipo, titulo, texto){
+    const icono = tipo === 'error' ? 'fa-face-frown' : 'fa-magnifying-glass';
+    els.grid.innerHTML = `
+      <div class="estado ${tipo === 'error' ? 'estado--error' : ''}">
+        <i class="fa-solid ${icono}"></i>
+        <h3>${escapeHTML(titulo)}</h3>
+        <p>${escapeHTML(texto)}</p>
+      </div>
+    `;
+    els.contador.textContent = '0';
+  }
+
+  /* ---------- Modal ---------- */
+  let ultimoFoco = null;
+
+  function abrirModal(act, acento){
+    ultimoFoco = document.activeElement;
+    els.modalHeader.style.setProperty('--acento', acento.acento);
+    els.modalTitulo.textContent = act.titulo;
+
+    els.modalTags.innerHTML = `
+      <span class="pill pill--edad"><i class="fa-solid fa-face-smile"></i> ${act.edad_minima}–${act.edad_maxima} años</span>
+      <span class="pill pill--instrumento"><i class="fa-solid ${iconoInstrumento(act.instrumento)}"></i> ${escapeHTML(act.instrumento)}</span>
+      ${act.duracion ? `<span class="pill pill--tiempo"><i class="fa-regular fa-clock"></i> ${escapeHTML(act.duracion)}</span>` : ''}
+    `;
+
+    const objetivoWrap = document.getElementById('modal-objetivo-wrap');
+    if (act.objetivo){
+      objetivoWrap.style.display = 'flex';
+      els.modalObjetivo.textContent = act.objetivo;
+    } else {
+      objetivoWrap.style.display = 'none';
+    }
+
+    els.modalInstrucciones.innerHTML = formatearInstrucciones(act.instrucciones);
+
+    els.overlay.classList.add('activo');
+    document.body.style.overflow = 'hidden';
+    els.modalCerrar.focus();
+  }
+
+  function cerrarModal(){
+    els.overlay.classList.remove('activo');
+    document.body.style.overflow = '';
+    if (ultimoFoco) ultimoFoco.focus();
+  }
+
+  function formatearInstrucciones(texto){
+    if (!texto || !texto.trim()){
+      return `<p>Este ejercicio aún no tiene instrucciones detalladas.</p>`;
+    }
+    const lineas = texto.split('\n').map(l => l.trim()).filter(Boolean);
+
+    if (lineas.length > 1){
+      const items = lineas.map(l => `<li>${escapeHTML(l.replace(/^\d+[\.\)]\s*/, ''))}</li>`).join('');
+      return `<ol>${items}</ol>`;
+    }
+    return `<p>${escapeHTML(texto)}</p>`;
+  }
+
+  function escapeHTML(str){
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  /* ---------- Eventos ---------- */
+  els.selEdad.addEventListener('change', aplicarFiltros);
+  els.selInstrumento.addEventListener('change', aplicarFiltros);
+  els.selObjetivo.addEventListener('change', aplicarFiltros);
+
+  els.btnLimpiar.addEventListener('click', () => {
+    els.selEdad.value = '';
+    els.selInstrumento.value = '';
+    els.selObjetivo.value = '';
+    aplicarFiltros();
+  });
+
+  els.modalCerrar.addEventListener('click', cerrarModal);
+  els.overlay.addEventListener('click', (e) => { if (e.target === els.overlay) cerrarModal(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && els.overlay.classList.contains('activo')) cerrarModal();
+  });
+
+  iniciar();
+})();
+</script>
+</body>
+</html>
